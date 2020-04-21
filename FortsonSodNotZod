@@ -1,0 +1,469 @@
+//AUTHOR: DAVID FORTSON
+//COURSE: CPT 167
+//PURPOSE: TO CALCULATE DISCOUNTED PRICES ON SOD
+//STARTDATE: 4/14/2020
+
+package edu.cpt167.Fortson.participation6;
+
+import java.util.Scanner;
+
+public class FortsonSodNotZodPart6
+{
+	//CONSTANTS
+	public static final double DISCOUNT_RATE_MEMBER = .15;
+	public static final String DISCOUNT_NAME_MEMBER = "Member Rate";
+	public static final double DISCOUNT_RATE_SENIOR = .25;
+	public static final String DISCOUNT_NAME_SENIOR = "Senior Rate";
+	public static final double DISCOUNT_RATE_NONE = 0.0;
+	public static final String DISCOUNT_NAME_NONE = "No Discount";
+	public static final String NAME_QUIT = "Quit";
+	public static final double TAX_RATE = .075;
+	public static final int MAX_PURCHASE_COUNT = 2;
+	public static final String NAME_BASIC = "Basic Sod";
+	public static final double PRICE_BASIC = 7.99;
+	public static final String NAME_SPECIAL = "Special Sod";
+	public static final double PRICE_SPECIAL = 11.99;
+	public static final String NAME_PREMIUM = "Ultra Sod";
+	public static final double PRICE_PREMIUM = 21.99;
+	public static final int RESET_VALUE = 0;
+
+	public static void main(String[] args) 
+	{
+		//DECLARE AND INITIALIZE VARIABLES
+		Scanner input = new Scanner(System.in);
+		
+		String userName = "";
+		char menuSelection = ' ';
+		char itemSelection = ' ';
+		int howMany = 0;
+		int purchaseCounter = 0;
+		int memberCount = 0;
+		int seniorCount = 0;
+		int noDiscountCount = 0;
+		int premiumCount = 0;
+		int specialCount = 0;
+		int basicCount = 0;
+		String itemName = "";
+		double itemPrice = 0.0;
+		String discountName = "";
+		double discountPrice = 0.0;
+		double discountAmt = 0.0;
+		double discountRate = 0.0;
+		double subTotal = 0.0;
+		double tax = 0.0;
+		double totalCost = 0.0;
+		double grandTotal = 0.0;
+		
+		//WELCOME BANNER
+		displayWelcomeBanner();
+		
+		//USER ASSIGNMENT
+		userName = getUserName(input);
+		
+		//MENU SELECTION
+		menuSelection = validateMainMenu(input);
+		
+		//RUN-WHILE NOT QUIT
+		while (menuSelection != 'Q')
+		{
+			//RUN-WHILE PURCHASE COUNT IS LESS THAN 2
+			while (purchaseCounter < MAX_PURCHASE_COUNT)
+			{
+				//GET AND VALIDATE ITEM SELECTION
+				itemSelection = validateItemMenu(input);
+				
+				//GET AND VALIDATE QUANTITY
+				howMany = validateHowMany(input);
+				
+				//PROCESSES
+				
+				//MAIN MENU SELECTION STRUCTURE
+				if (menuSelection == 'A')
+				{
+					discountRate = DISCOUNT_RATE_MEMBER;
+					discountName = DISCOUNT_NAME_MEMBER;
+					memberCount++;
+				}//END OF IF
+				else if (menuSelection == 'B')
+				{
+					discountRate = DISCOUNT_RATE_SENIOR;
+					discountName = DISCOUNT_NAME_SENIOR;
+					seniorCount++;
+				}//END OF ELSE IF
+				else 
+				{
+					discountRate = DISCOUNT_RATE_NONE;
+					discountName = DISCOUNT_NAME_NONE;
+					noDiscountCount++;
+				}//END OF ELSE
+				
+				//ITEM MENU SELECTION STRUCTURE
+				if (itemSelection == 'A')
+				{
+					itemName = NAME_PREMIUM;
+					itemPrice = PRICE_PREMIUM;
+					premiumCount++;
+				}//END OF IF
+				else if (itemSelection == 'B')
+				{
+					itemName = NAME_SPECIAL;
+					itemPrice = PRICE_SPECIAL;
+					specialCount++;
+				}//END OF ELSE IF
+				else
+				{
+					itemName = NAME_BASIC;
+					itemPrice = PRICE_BASIC;
+					basicCount++;
+				}//END OF ELSE
+				
+				//CALCULATE DISCOUNT AMOUNT
+				discountAmt = itemPrice * discountRate;
+				//CALCULATE DISCOUNT PRICE
+				discountPrice = itemPrice - discountAmt;
+				//CALCULATE SUBTOTAL
+				subTotal = howMany * discountPrice;
+				//CALCULATE TAX
+				tax = subTotal * TAX_RATE;
+				//CALCULATE TOTAL COST
+				totalCost = totalCost + subTotal + tax;
+				//CALCULATE GRAND TOTAL
+				grandTotal = grandTotal + totalCost;
+				
+				//DISPLAY RECEIPT
+				displayItemReceipt(itemName, itemPrice, discountName, discountPrice, howMany);
+				
+				purchaseCounter++;
+			}//END RUN-WHILE PURCHASE COUNT IS LESS THAN 2
+			
+			//DISPLAY ORDER TOTAL
+			displayOrderTotal(subTotal, tax, totalCost);
+			
+			//RESET VALUES IF PURCHASE COUNT IS HIGHER THAN 2
+			totalCost = RESET_VALUE;
+			purchaseCounter = RESET_VALUE;
+			
+			//MODIFY LCV
+			menuSelection = validateMainMenu(input);
+		}//END RUN-WHILE NOT QUIT
+		
+		//DISPLAY FINAL REPORT
+		if (grandTotal > 0.0)
+		{
+			displayFinalReport(userName, memberCount, seniorCount, noDiscountCount, premiumCount, specialCount, basicCount, grandTotal);
+		}
+		
+		//DISPLAY FAREWELL
+		displayFarewellMessage();
+		
+		//CLOSE SCANNER
+		input.close();
+
+	}//END MAIN METHOD
+	
+	//METHOD FOR WELCOME
+	public static void displayWelcomeBanner()
+	{
+		//WELCOME
+		System.out.println("Welcome to the SodNotZod app!");
+		System.out.println("We will help you calculate discounted prices on your sod!");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println();
+	}//END OF WELCOME METHOD
+	
+	//USER NAME METHOD
+	public static String getUserName (Scanner borrowedInput)
+	{
+		String localUserName = "";
+			
+		System.out.println("Please enter your first name:");
+		localUserName = borrowedInput.next();
+		return localUserName;
+	}//END OF USER NAME METHOD
+	
+	//MAIN MENU METHOD
+	public static char validateMainMenu(Scanner borrowedInput)
+	{
+		char localMenuSelection = ' ';
+		
+		//MAIN MENU
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("DISCOUNT MENU:");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 9 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%9s%10.2f\n", "[A]", DISCOUNT_NAME_MEMBER, "%", DISCOUNT_RATE_MEMBER);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 9 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%9s%10.2f\n", "[B]", DISCOUNT_NAME_SENIOR, "%", DISCOUNT_RATE_SENIOR);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 9 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%9s%10.2f\n", "[C]", DISCOUNT_NAME_NONE, "%", DISCOUNT_RATE_NONE);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		System.out.printf("%-5s%-10s\n", "[Q]", NAME_QUIT);
+		System.out.println("Please enter your selection below:");
+		localMenuSelection = borrowedInput.next().toUpperCase().charAt(0);
+		
+		//VALIDATION LOOP
+		while (localMenuSelection != 'A' && localMenuSelection != 'B' && localMenuSelection != 'C' && localMenuSelection != 'Q')
+		{	
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("~~~~INVALID SELECTION~~~~");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("DISCOUNT MENU:");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			//Spacing
+			System.out.println();
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 9 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%9s%10.2f\n", "[A]", DISCOUNT_NAME_MEMBER, "%", DISCOUNT_RATE_MEMBER);
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 9 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%9s%10.2f\n", "[B]", DISCOUNT_NAME_SENIOR, "%", DISCOUNT_RATE_SENIOR);
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 9 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%9s%10.2f\n", "[C]", DISCOUNT_NAME_NONE, "%", DISCOUNT_RATE_NONE);
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			System.out.printf("%-5s%-10s\n", "[Q]", NAME_QUIT);
+			System.out.println("Please enter your selection below:");
+			localMenuSelection = borrowedInput.next().toUpperCase().charAt(0);
+		}//END VALIDATION LOOP
+		
+		return localMenuSelection;
+		
+	}//END MAIN MENU METHOD
+	
+	//ITEM SELECTION MENU METHOD
+	public static char validateItemMenu(Scanner borrowedInput)
+	{
+		char localItemSelection = ' ';
+		
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("SOD MENU:");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 5 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%5s%10.2f\n", "[A]", NAME_PREMIUM, "$", PRICE_PREMIUM);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 4 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%4s%10.2f\n", "[B]", NAME_SPECIAL, "$", PRICE_SPECIAL);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Left-alligned with 10 minimum characters
+		//Third: Right-alligned with 5 minimum characters
+		//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%-10s%5s%10.2f\n", "[C]", NAME_BASIC, "$", PRICE_BASIC);
+		System.out.println("Please enter your selection below:");
+		localItemSelection = borrowedInput.next().toUpperCase().charAt(0);
+		
+		//VALIDATION LOOP
+		while (localItemSelection != 'A' && localItemSelection != 'B' && localItemSelection != 'C')
+		{
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("~~~~INVALID SELECTION~~~~");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println();
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("SOD MENU:");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			//Spacing
+			System.out.println();
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 5 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%5s%10.2f\n", "[A]", NAME_PREMIUM, "$", PRICE_PREMIUM);
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 4 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%4s%10.2f\n", "[B]", NAME_SPECIAL, "$", PRICE_SPECIAL);
+			//Create 3 columns
+			//First: Left-alligned with 5 minimum characters
+			//Second: Left-alligned with 10 minimum characters
+			//Third: Right-alligned with 5 minimum characters
+			//Fourth: Right-alligned with 10 minimum characters and 2 possible decimal places
+			System.out.printf("%-5s%-10s%5s%10.2f\n", "[C]", NAME_BASIC, "$", PRICE_BASIC);
+			System.out.println("Please enter your selection below:");
+			localItemSelection = borrowedInput.next().toUpperCase().charAt(0);
+		}//END VALIDATION LOOP
+			
+		return localItemSelection;
+		
+	}//END ITEM SELECTION MENU METHOD
+	
+	//QUANTITY VALIDATION METHOD
+	public static int validateHowMany(Scanner borrowedInput)
+	{
+		int localHowMany = 0;
+		
+		System.out.println("How many bags of sod are you looking to purchase today?");
+		
+		localHowMany = borrowedInput.nextInt();
+		
+		//VALIDATION LOOP
+		while (localHowMany <= 0)
+		{
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("~~~~INVALID QUANTITY~~~~");
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			System.out.println("Please enter a number greater than 0:");
+			localHowMany = borrowedInput.nextInt();
+		}//END VALIDATION LOOP
+		
+		return localHowMany;
+		
+	}//END QUANTITY VALIDATION METHOD
+	
+	//ITEM RECEIPT METHOD
+	public static void displayItemReceipt(String borrowedItemName, double borrowedItemPrice, String borrowedDiscountName,
+		double borrowedDiscountPrice, int borrowedHowMany)
+	{
+		//DISPLAY
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("RECEIPT:");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		//Create 2 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 21 minimum characters
+		System.out.printf("%-5s%21s\n", "Item Name:", borrowedItemName);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 10 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%10s%10.2f\n", "Item Price:", "$", borrowedItemPrice);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 15 minimum characters
+		System.out.printf("%-5s%22s\n", "Discount:", borrowedDiscountName);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 4 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%4s%10.2f\n", "Discounted Price:", "$", borrowedDiscountPrice);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 22 minimum characters
+		System.out.printf("%-5s%22d\n", "Quantity:", borrowedHowMany);
+		System.out.println();
+	}//END ITEM RECEIPT METHOD
+	
+	//ORDER TOTAL METHOD
+	public static void displayOrderTotal(double borrowedSubTotal, double borrowedTax, double borrowedTotalCost)
+	{
+		//DISPLAY
+		System.out.println();
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("ORDER TOTALS:");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 11 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%11s%10.2f\n", "Sub Total:", "$", borrowedSubTotal);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 16 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%16s%10.2f\n", "Tax:", "$", borrowedTax);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 10 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%10s%10.2f\n", "Total Cost:", "$", borrowedTotalCost);
+	}//END ORDER TOTAL METHOD
+	
+	//FINAL REPORT METHOD
+	public static void displayFinalReport(String borrowedUserName, int borrowedMemberCount, int borrowedSeniorCount, int borrowedNoDiscountCount, int borrowedPremiumCount, int borrowedSpecialCount, int borrowedBasicCount, double borrowedGrandTotal)
+	{
+		//DISPLAY
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("FINAL REPORT:");
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		//Create 2 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 15 minimum characters
+		System.out.printf("%-5s%15s\n", "Username:", borrowedUserName);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 16 minimum characters
+		System.out.printf("%-5s%16d\n", "Members:", borrowedMemberCount);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 16 minimum characters
+		System.out.printf("%-5s%16d\n", "Seniors:", borrowedSeniorCount);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 11 minimum characters
+		System.out.printf("%-5s%11d\n", "No Discounts:", borrowedNoDiscountCount);
+		//Create 2 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 10 minimum characters
+		System.out.printf("%-5s%10d\n", "Premium Sales:", borrowedPremiumCount);
+		//Create 2 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 10 minimum characters
+		System.out.printf("%-5s%10d\n", "Special Sales:", borrowedSpecialCount);
+		//Create 2 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 12 minimum characters
+		System.out.printf("%-5s%12d\n", "Basic Sales:", borrowedBasicCount);
+		//Create 3 columns
+		//First: Left-alligned with 5 minimum characters
+		//Second: Right-alligned with 2 minimum characters
+		//Third: Right-alligned with 10 minimum characters and 2 possible decimal places
+		System.out.printf("%-5s%2s%10.2f\n", "Grand Total:", "$", borrowedGrandTotal);
+	}//END FINAL REPORT METHOD
+	
+	//FAREWELL METHOD
+	public static void displayFarewellMessage()
+	{
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//Spacing
+		System.out.println();
+		System.out.println("Thank you for shopping with the SodNotZod app!");
+		System.out.println("Have a great rest of your day!");
+	}//END FAREWELL METHOD
+	
+}//END CLASS
